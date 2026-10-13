@@ -14,7 +14,7 @@ SELECT ISNULL(CONVERT(VARCHAR(16),HASHBYTES('MD5', p.OrganizationName),2),'') AS
 	, ISNULL(CONVERT(VARCHAR(16), cu.CurrencyKey), 0) AS CurrencyKey
 	, CONVERT(VARCHAR(512), p.[FileName]) AS FileName
 	,ISNULL(CONVERT(VARCHAR(36),p.LineageKey),0)  AS  LineageKey
-FROM LH.aw_stg.organization p
-LEFT JOIN (SELECT CONVERT(VARCHAR(16),HASHBYTES('MD5', OrganizationName),2) AS ParentOrganizationKey, OrganizationName FROM LH.aw_stg.organization) c 
+FROM lh_dwa.aw_stg.organization p
+LEFT JOIN (SELECT CONVERT(VARCHAR(16),HASHBYTES('MD5', OrganizationName),2) AS ParentOrganizationKey, OrganizationName FROM lh_dwa.aw_stg.organization) c 
 ON c.OrganizationName=p.ParentOrganizationName
 INNER JOIN aw.DimCurrency cu ON cu.CurrencyAlternateKey=p.CurrencyCode COLLATE Latin1_General_100_CI_AS_KS_WS_SC_UTF8;

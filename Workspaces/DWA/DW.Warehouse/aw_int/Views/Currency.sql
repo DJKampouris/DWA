@@ -18,4 +18,4 @@ SELECT  CONVERT(VARCHAR(16),HASHBYTES('MD5', [CurrencyCode]),2) AS CurrencyKey
 	, ISNULL(CONVERT(bigint,BINARY_CHECKSUM([CurrencyName],[CurrencyCode])),0) AS RowChecksum
 	, CONVERT(VARCHAR(512), [FileName]) AS FileName
 	,ISNULL(CONVERT(VARCHAR(36),LineageKey),0) AS LineageKey
-FROM LH.aw_stg.[currency];
+FROM lh_dwa.aw_stg.[currency];

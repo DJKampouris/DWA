@@ -18,7 +18,7 @@ BEGIN
 
 	SELECT @SourceObject =t.SourceObject 
 	, @TargetObject = t.SchemaName + '.' +  t.TableName
-	FROM Meta.config.edwTables t 
+	FROM sql_meta.config.edwTables t 
 	WHERE t.TableID = @TableID		
    
 	SET @TempTable = @TargetObject+'_tmp'

@@ -33,12 +33,12 @@ BEGIN
 		, @BaseDims VARCHAR(400)
 
 	SELECT @SourceObject =SourceObject, @BusinessKeys=BusinessKeys, @TableType=TableType, @PrimaryKey=PrimaryKey,@DeDupeFlag = DedupeFlag
-	FROM Meta.config.edwTables 
+	FROM sql_meta.config.edwTables 
 	WHERE TableID=@TableID
 	
 	SELECT @RelatedBK = string_agg(r.BusinessKeys, ',')  
-	FROM Meta.config.edwTableJoins j  
-	INNER JOIN Meta.config.edwTables r on j.RelatedTableID =r.TableID
+	FROM sql_meta.config.edwTableJoins j  
+	INNER JOIN sql_meta.config.edwTables r on j.RelatedTableID =r.TableID
 	WHERE j.TableID=@TableID
 
 	IF @DeDupeFlag=1
@@ -46,8 +46,8 @@ BEGIN
 
 	/* Primary Keys (if any) from joined table if Fact or Star Schema) */
 	SELECT @PKs = string_agg(r.PrimaryKey, ','), @BaseDims = string_agg(r.SchemaName + '.' + r.TableName, ',')
-	FROM Meta.config.edwTableJoins j
-	INNER JOIN Meta.config.edwTables r ON j.RelatedTableID = r.TableID
+	FROM sql_meta.config.edwTableJoins j
+	INNER JOIN sql_meta.config.edwTables r ON j.RelatedTableID = r.TableID
 	WHERE j.TableID = @TableID
 
 	SET @ColumnsPK = (SELECT string_agg( c.name + ' ' + d.name  + case when c.collation_name is not null then '(' + convert (varchar(50),COALESCE(c.max_length/(length/prec),c.max_length) ) + ')'  else '' end    			+ CASE WHEN c.is_nullable=0 then ' NOT NULL' ELSE ' NULL' END 

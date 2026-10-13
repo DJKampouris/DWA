@@ -20,5 +20,5 @@ SELECT  CONVERT(VARCHAR(16),HASHBYTES('MD5', CONVERT(VARCHAR(4),a.AccountCode)),
 	, CONVERT(VARCHAR(200), a.CustomMemberOptions COLLATE Latin1_General_100_CI_AS_KS_WS_SC_UTF8) AS CustomMemberOptions
 	, CONVERT(VARCHAR(512), a.[FileName] COLLATE Latin1_General_100_CI_AS_KS_WS_SC_UTF8) AS FileName
 	,ISNULL(CONVERT(VARCHAR(36),LineageKey COLLATE Latin1_General_100_CI_AS_KS_WS_SC_UTF8),0) AS LineageKey
-FROM LH.aw_stg.[account] a
-LEFT JOIN (SELECT CONVERT(VARCHAR(16),HASHBYTES('MD5', CONVERT(VARCHAR(4),ParentAccountCode)),2) AS ParentAccountKey, AccountCode  FROM LH.aw_stg.account) c	ON c.AccountCode = a.ParentAccountCode;
+FROM lh_dwa.aw_stg.[account] a
+LEFT JOIN (SELECT CONVERT(VARCHAR(16),HASHBYTES('MD5', CONVERT(VARCHAR(4),ParentAccountCode)),2) AS ParentAccountKey, AccountCode  FROM lh_dwa.aw_stg.account) c	ON c.AccountCode = a.ParentAccountCode;

@@ -106,7 +106,7 @@ if mode == "overwrite":
     spark.sql(f"DROP TABLE IF EXISTS {target_table}")
 spark.createDataFrame(df).write.mode(mode).options(**target_settings).format("delta").saveAsTable(target_table)
 
-print(f"Wrote {row_count} rows from {file_path} to FabricLH.dbo.{target_table}.")
+print(f"Wrote {row_count} rows from {file_path} to Fabriclh_dwa.dbo.{target_table}.")
 
 # METADATA ********************
 

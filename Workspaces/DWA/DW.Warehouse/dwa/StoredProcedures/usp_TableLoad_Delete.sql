@@ -20,7 +20,7 @@ BEGIN
 	, @SourceObject =t.SourceObject
 	, @BusinessKeys =t.BusinessKeys
 	, @DeleteDDL=t.DeleteDDL
-	FROM Meta.config.edwTables t 
+	FROM sql_meta.config.edwTables t 
 	WHERE t.TableID = @TableID	
 	
     IF @TargetObject IS NULL

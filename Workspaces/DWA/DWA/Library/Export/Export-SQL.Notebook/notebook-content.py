@@ -28,7 +28,7 @@
 
 # PARAMETERS CELL ********************
 
-SourceSettings = '{"sourceObject":"LH.aw_stg.account"}'
+SourceSettings = '{"sourceObject":"lh_dwa.aw_stg.account"}'
 TargetSettings = '{"directory": "export/parquet", "file":"account.parquet"}'
 SourceConnectionSettings = None
 TargetConnectionSettings = None

@@ -13,4 +13,4 @@ SELECT [ReportNo]
       ,[ToAccountNo]
 	  ,[FileName] AS FileName
       ,ISNULL(CONVERT(VARCHAR(36),LineageKey),0) AS LineageKey
-  FROM LH.aw_stg.[accountrangerules]
+  FROM lh_dwa.aw_stg.[accountrangerules]

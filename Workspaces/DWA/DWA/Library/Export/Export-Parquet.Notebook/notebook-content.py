@@ -28,7 +28,7 @@
 
 # PARAMETERS CELL ********************
 
-SourceSettings ='{"Query":"SELECT * FROM FabricDW.aw.DimDate"}'
+SourceSettings ='{"Query":"SELECT * FROM dw_dwa.aw.DimDate"}'
 TargetSettings ='{"Directory": "Export/parquet", "File": "DimDate.parquet"}'
 SourceConnectionSettings = None
 TargetConnectionSettings = None

@@ -12,4 +12,4 @@ SELECT ISNULL(CONVERT(VARCHAR(16),HASHBYTES('MD5', s.ScenarioName),2),'') AS Sce
 ,ISNULL(CONVERT(varchar(50),s.ScenarioName),'') AS ScenarioName
 , CONVERT(VARCHAR(512), s.[FileName]) AS FileName
 , ISNULL(CONVERT(VARCHAR(36), s.LineageKey), 0) AS  LineageKey
-FROM LH.aw_stg.scenario s;
+FROM lh_dwa.aw_stg.scenario s;

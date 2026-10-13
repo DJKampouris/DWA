@@ -22,4 +22,4 @@ SELECT [ReportNo]
 	  ,[Calc1] as Calc1
 	  ,[FileName]
 	  ,ISNULL(CONVERT(VARCHAR(36),LineageKey),0) AS LineageKey
-  FROM LH.aw_stg.[accountrange]
+  FROM lh_dwa.aw_stg.[accountrange]

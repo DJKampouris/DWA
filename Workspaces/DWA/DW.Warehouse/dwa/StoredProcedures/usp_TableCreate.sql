@@ -27,10 +27,10 @@ BEGIN
 		, @RelatedBusinessKeys nvarchar(4000)
 
 	IF @TableID IS NULL
-		SELECT @TableID = t.TableID FROM Meta.config.edwTables t WHERE ((t.SchemaName + '.' +  t.TableName =@TargetObject) OR t.TableName =@TargetObject)
+		SELECT @TableID = t.TableID FROM sql_meta.config.edwTables t WHERE ((t.SchemaName + '.' +  t.TableName =@TargetObject) OR t.TableName =@TargetObject)
 
 	SELECT @TargetSchema =t.SchemaName, @TargetTable =t.TableName, @TableType =t.TableType , @SourceObject =t.SourceObject, @PrimaryKey=t.PrimaryKey, @BusinessKeys =t.BusinessKeys
-	FROM Meta.config.edwTables t WHERE (t.SchemaName + '.' +  t.TableName =@TargetObject) OR t.TableName =@TargetObject OR t.TableID = @TableID
+	FROM sql_meta.config.edwTables t WHERE (t.SchemaName + '.' +  t.TableName =@TargetObject) OR t.TableName =@TargetObject OR t.TableID = @TableID
 
 	IF @TargetTable is not null SET @TargetObject=quotename(coalesce(@TargetSchema,'dbo')) + '.' + quotename(@TargetTable)
 	IF @TargetTable is null

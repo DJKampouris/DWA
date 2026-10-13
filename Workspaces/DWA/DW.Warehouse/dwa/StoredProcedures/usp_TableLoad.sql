@@ -106,7 +106,7 @@ BEGIN
 		, @TargetCollation sysname
 		, @CastBusinessKeys nvarchar(max)
 	IF @TableID IS NULL
-		SELECT TOP 1 @TableID = t.TableID FROM Meta.config.edwTables t WHERE ((t.SchemaName + '.' +  t.TableName = @TargetObject) OR t.TableName =@TargetObject) ORDER BY TableID
+		SELECT TOP 1 @TableID = t.TableID FROM sql_meta.config.edwTables t WHERE ((t.SchemaName + '.' +  t.TableName = @TargetObject) OR t.TableName =@TargetObject) ORDER BY TableID
 
 	SELECT @SchemaName =SchemaName, @TableName =TableName, @SourceObject =t.SourceObject  ,@TableType =t.TableType , @TargetSchema =t.SchemaName ,  @TargetTable =t.TableName,  @SourceType=t.SourceType,  @PrimaryKey=t.PrimaryKey, @BusinessKeys =t.BusinessKeys
 	, @UpdateFlag=coalesce(t.UpdateFlag, case when t.TableType='Fact'then 0 else 1 end )
@@ -138,11 +138,11 @@ BEGIN
 	, @Identity = t.[Identity]
 	, @IdentityExpression = im.Expression
 	, @RowChecksum = coalesce(t.RowChecksum, coalesce(t.UpdateFlag, case when t.TableType='Fact'then 0 else 1 end ))/* Only add RowChecksum if Updating Table */
-	, @RelatedTableCount = (SELECT COUNT(*) from Meta.config.edwTableJoins where TableID=@TableID)
+	, @RelatedTableCount = (SELECT COUNT(*) from sql_meta.config.edwTableJoins where TableID=@TableID)
 	, @TableSwapFlag = coalesce(t.TableSwapFlag,0)
 	
-	FROM Meta.config.edwTables t 
-	LEFT JOIN Meta.config.IdentityMethods im on im.IdentityMethod=coalesce(t.IdentityMethod,'Hash-MD5') --Default IdentityMethod
+	FROM sql_meta.config.edwTables t 
+	LEFT JOIN sql_meta.config.IdentityMethods im on im.IdentityMethod=coalesce(t.IdentityMethod,'Hash-MD5') --Default IdentityMethod
 	WHERE t.TableID = @TableID
 
 	IF @@LANGUAGE <> @Language  and coalesce(@Language,'' ) <> ''
@@ -224,7 +224,7 @@ BEGIN
 	END
 
 	IF object_id(@SourceObject) IS NULL AND @Skip = 0
-		RAISERROR ('SourceObject %s not found. Check Meta.config.edwTables for TableID %i', 16, 1, @SourceObject, @TableID)
+		RAISERROR ('SourceObject %s not found. Check sql_meta.config.edwTables for TableID %i', 16, 1, @SourceObject, @TableID)
 
 	IF @DedupeFlag =1 and @skip=0
 		SELECT @sqlWhereOuter= 'RowVersionNo=1' 
@@ -284,15 +284,15 @@ BEGIN
 				, min(coalesce(r.TablePrefix, lower(left(replace(r.TableName, 'Dim', ''), 1)))) TablePrefix
 				, min(coalesce(j.JoinSQL, 't.' + ltrim(r.PrimaryKey) + '=' + coalesce(r.TablePrefix, lower(left(replace(r.TableName, 'Dim', ''), 1))) + '.' + ltrim(r.PrimaryKey))) WhereJoinSQL
 				, coalesce(j.JoinType, @JoinType) AS JoinType
-			FROM Meta.config.edwTables r
-			INNER JOIN Meta.config.edwTableJoins j ON j.RelatedTableID = r.TableID
+			FROM sql_meta.config.edwTables r
+			INNER JOIN sql_meta.config.edwTableJoins j ON j.RelatedTableID = r.TableID
 			CROSS APPLY string_split(r.BusinessKeys, ',') bk
 			LEFT JOIN s ON s.colname = bk.value --To check for columns that needed collation
 			WHERE j.TableID = @TableID
 			GROUP BY r.TableID, r.BusinessKeys  , r.SchemaName, r.TableName, r.PrimaryKey, j.JoinSQL, j.JoinType
 		), t AS (
 			SELECT t.TableID, coalesce(t.TablePrefix, lower(left(replace(t.TableName, 'Dim', ''), 1))) AS TablePrefix
-			FROM Meta.config.edwTables t
+			FROM sql_meta.config.edwTables t
 			WHERE t.TableID = @TableID
 		)	
 		SELECT @InsertColumns = string_agg( coalesce(j.AliasPK, r.PrimaryKey), ',') 
@@ -302,7 +302,7 @@ BEGIN
 		, @LocalJoinSQL = string_agg(r.WhereJoinSQL +' ' ,char(13))
 		, @RelatedTables= string_agg(r.SchemaName + '.' + r.TableName, ',')
 		, @BusinessKeysQualified = string_agg( r.TablePrefix + '.' + r.PrimaryKey ,',')
-		FROM Meta.config.edwTableJoins  j 
+		FROM sql_meta.config.edwTableJoins  j 
 		INNER JOIN r on j.RelatedTableID =r.RelatedTableID
 		WHERE j.TableID=@TableID
 		ELSE
@@ -330,11 +330,11 @@ BEGIN
 		SET @HideColumns = coalesce(@HideColumns+ ',' ,'') + @InsertColumns
 
 		IF @RelatedTableCount>0
-			IF EXISTS (SELECT * FROM Meta.config.edwTableJoins WHERE TableID=@TableID and (ShowBK is null or ShowBK=0))
+			IF EXISTS (SELECT * FROM sql_meta.config.edwTableJoins WHERE TableID=@TableID and (ShowBK is null or ShowBK=0))
 			BEGIN 	
 				SELECT @VarHideCols = (select string_agg(r.BusinessKeys, ',') 
-					from Meta.config.edwTableJoins j
-					inner join Meta.config.edwTables r on r.TableID=j.RelatedTableID
+					from sql_meta.config.edwTableJoins j
+					inner join sql_meta.config.edwTables r on r.TableID=j.RelatedTableID
 					where j.TableID=@TableID
 					and (ShowBK is null or ShowBK=0))
 				SET @HideColumns = coalesce(@HideColumns+ ',' ,'') +@VarHideCols				
@@ -347,7 +347,7 @@ BEGIN
 		/* Adding Identity */
 
 		IF @Identity = 1 AND @PrimaryKey is null
-			RAISERROR ('Unsupported Identity=1 AND PrimaryKey not defined for Table %s. Check Meta.config.edwTables.',16,1, @TargetTable)	
+			RAISERROR ('Unsupported Identity=1 AND PrimaryKey not defined for Table %s. Check sql_meta.config.edwTables.',16,1, @TargetTable)	
 		IF @Identity = 1 AND @Exists=1 AND @IdentityExpression like 'ROW_NUMBER%'
 		BEGIN
 			SET @SQL = N'SELECT @MaxIdentity = ISNULL(MAX(' + @PrimaryKey + '), 0) FROM ' + @TargetObject +';';
@@ -362,7 +362,7 @@ BEGIN
 			SET @SelectColumns = REPLACE(REPLACE(@IdentityExpression, '@BKs', @CastBusinessKeys),'@MaxID', CONVERT(varchar(4000), @MaxIdentity)) + ' AS ' + QUOTENAME(@PrimaryKey) + ',' + @SelectColumns;
 		END
 		ELSE IF @Identity=1 AND @BusinessKeys is null
-		RAISERROR ('Unsupported Identity=1 AND BusinessKeys not defined for Table %s. Check Meta.config.edwTables.',16,1,@TargetTable)
+		RAISERROR ('Unsupported Identity=1 AND BusinessKeys not defined for Table %s. Check sql_meta.config.edwTables.',16,1,@TargetTable)
 
 		SELECT @PrimaryKey=replace(@TargetTable, 'Dim','') + 'Key'
 
@@ -468,7 +468,7 @@ BEGIN
 		END
 	END
 	ELSE IF @Skip=0
-		RAISERROR ('Unsupported SourceType=%s. Check Meta.config.edwTables.SourceType',16,1,@SourceType)
+		RAISERROR ('Unsupported SourceType=%s. Check sql_meta.config.edwTables.SourceType',16,1,@SourceType)
 
 		IF @PostLoadSQL IS NOT NULL
 		BEGIN

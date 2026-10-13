@@ -10,4 +10,4 @@ SELECT CONVERT(VARCHAR(16),HASHBYTES('MD5', p.DepartmentGroupName),2) AS Departm
 	, ISNULL(CONVERT(VARCHAR(50), p.DepartmentGroupName ), '') AS DepartmentGroupName
 	, CONVERT(VARCHAR(512), p.[FileName] ) AS FileName
 	, ISNULL(CONVERT(VARCHAR(36),LineageKey ),0) AS LineageKey
-FROM LH.aw_stg.departmentgroup p
+FROM lh_dwa.aw_stg.departmentgroup p
